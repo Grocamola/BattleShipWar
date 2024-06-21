@@ -1,0 +1,107 @@
+#root {
+  max-width: 1280px;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+
+  --color__primary-dark: rgb(27, 27, 56);
+  --color__primary-paragraph: rgb(249, 249, 249);
+
+
+  width: 100vw;
+  height: 100vh;
+
+  background-color: var(--color__primary-dark);
+  color: var(--color__primary-paragraph);
+}
+
+body { 
+  padding: 0;
+  margin: 0;
+}
+button, a { 
+  cursor: pointer;
+}
+p, h1, h2, h3, h4, h5, h6, ul, li { 
+  padding: 0;
+  margin: 0;
+}
+li { 
+  list-style-type: none;
+  margin: 5px auto;
+}
+
+
+.backdrop { 
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color:rgba(0, 0, 0, 0.4);
+  z-index: 1;
+}
+
+
+
+/* Buttons */
+.original-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  text-decoration: none;
+  color: #ffffff;
+  font-size: 18px;
+  border-radius: 5px;
+  width: 200px;
+  height: 40px;
+  border: 1px solid #ffffff;
+  position: relative;
+  transition: 0.3s;
+  background-color: #ffffff00;
+  margin: 20px auto;
+}
+
+.original-button::before, .original-button::after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  transform-origin: 100% 50%;
+  height: 1px;
+  width: 11px;
+  background-color: #ffffff;
+  border-radius: 2px;
+  will-change: transform;
+  transition: .3s;
+}
+
+.original-button::before {
+  transform: translateY(-50%) rotate(30deg);
+}
+
+.original-button::after {
+  transform: translateY(-50%) rotate(-30deg);
+}
+
+.original-button:hover::before {
+  transform: translate(5px, -50%) rotate(30deg);
+}
+
+.original-button:hover::after {
+  transform: translate(5px, -50%) rotate(-30deg);
+}
+
+
+
+.link-button { 
+  border: none;
+  background: none;
+  color: var(--color__primary-paragraph);
+}
+.link-button:hover { 
+  transform: scale(1.01)
+}
+
