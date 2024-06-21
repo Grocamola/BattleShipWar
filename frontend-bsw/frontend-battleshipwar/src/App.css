@@ -19,11 +19,18 @@ body {
   padding: 0;
   margin: 0;
 }
-
-p, h1, h2, h3, h4, h5, h6 { 
+button, a { 
+  cursor: pointer;
+}
+p, h1, h2, h3, h4, h5, h6, ul, li { 
   padding: 0;
   margin: 0;
 }
+li { 
+  list-style-type: none;
+  margin: 5px auto;
+}
+
 
 .backdrop { 
   width: 100vw;
@@ -86,3 +93,15 @@ p, h1, h2, h3, h4, h5, h6 {
 .original-button:hover::after {
   transform: translate(5px, -50%) rotate(-30deg);
 }
+
+
+
+.link-button { 
+  border: none;
+  background: none;
+  color: var(--color__primary-paragraph);
+}
+.link-button:hover { 
+  transform: scale(1.01)
+}
+

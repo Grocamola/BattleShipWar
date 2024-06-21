@@ -24,3 +24,20 @@
 .mainPage--signinForm input:focus { 
     outline: 2px solid red;
 }
+
+.mainPage--playerList { 
+    width: 300px;
+    margin: 100px auto;
+}
+
+
+.mainPage--twoteams { 
+    width: 600px;
+    margin: 100px auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.team--attackers, .team--defenders { 
+    width: 48%;
+}
