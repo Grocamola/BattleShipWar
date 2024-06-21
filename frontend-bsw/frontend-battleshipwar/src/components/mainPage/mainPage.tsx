@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 
-
 import './mainPage.css'
 import RegistrationForms from "../__utils/forms/registrationForms";
 
