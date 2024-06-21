@@ -1,42 +1,88 @@
 #root {
   max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+  margin: 0;
+  padding: 0;
   text-align: center;
+
+  --color__primary-dark: rgb(27, 27, 56);
+  --color__primary-paragraph: rgb(249, 249, 249);
+
+
+  width: 100vw;
+  height: 100vh;
+
+  background-color: var(--color__primary-dark);
+  color: var(--color__primary-paragraph);
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+body { 
+  padding: 0;
+  margin: 0;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+p, h1, h2, h3, h4, h5, h6 { 
+  padding: 0;
+  margin: 0;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.backdrop { 
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color:rgba(0, 0, 0, 0.4);
+  z-index: 1;
 }
 
-.card {
-  padding: 2em;
+
+
+/* Buttons */
+.original-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  text-decoration: none;
+  color: #ffffff;
+  font-size: 18px;
+  border-radius: 5px;
+  width: 200px;
+  height: 40px;
+  border: 1px solid #ffffff;
+  position: relative;
+  transition: 0.3s;
+  background-color: #ffffff00;
+  margin: 20px auto;
 }
 
-.read-the-docs {
-  color: #888;
+.original-button::before, .original-button::after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  transform-origin: 100% 50%;
+  height: 1px;
+  width: 11px;
+  background-color: #ffffff;
+  border-radius: 2px;
+  will-change: transform;
+  transition: .3s;
+}
+
+.original-button::before {
+  transform: translateY(-50%) rotate(30deg);
+}
+
+.original-button::after {
+  transform: translateY(-50%) rotate(-30deg);
+}
+
+.original-button:hover::before {
+  transform: translate(5px, -50%) rotate(30deg);
+}
+
+.original-button:hover::after {
+  transform: translate(5px, -50%) rotate(-30deg);
 }
