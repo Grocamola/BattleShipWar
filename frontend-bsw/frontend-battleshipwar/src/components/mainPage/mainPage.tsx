@@ -41,7 +41,7 @@ const MainPage = () => {
                     <div className="mainPage--playerList">
                         <h1>Players</h1>
                         <hr />
-                        <ul>{players.map(player => <li>{player}</li>)}</ul>
+                        <ul>{players.map((player, index) => <li key={index}>{player}</li>)}</ul>
                     </div>
                 </div>}
                 {state === "playerList" && players.length > 6 && <button className="original-button" onClick={teamUpBtnHandler}>Team up</button>}

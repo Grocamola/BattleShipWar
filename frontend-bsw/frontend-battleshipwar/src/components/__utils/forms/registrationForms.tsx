@@ -1,4 +1,4 @@
-import { FormEvent } from 'react'
+import { FormEvent, useEffect } from 'react'
 import socket from '../requests/socket'
 
 
@@ -30,6 +30,16 @@ const RegistrationForms = ({state, setState} : RegistrationFormsProps) => {
 
         // setState("playerList")
     }
+
+    useEffect(() => { 
+        socket.on('signin-response', (data) => {
+            if(data.success) { 
+                setState("playerList")
+            } else {
+                console.log('something wrong is going on here ...')
+            }
+        })
+    })
 
 
     return ( 
