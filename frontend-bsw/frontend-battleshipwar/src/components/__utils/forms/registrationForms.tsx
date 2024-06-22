@@ -1,10 +1,12 @@
-import { FormEvent, useEffect } from 'react'
+import { FormEvent } from 'react'
 import socket from '../requests/socket'
+import { useEffect } from 'react'
 
 
 interface RegistrationFormsProps { 
     state: "signin" | "signup" | "playerList" | "twoTeams",
-    setState: (state: "signin" | "signup" | "playerList" | "twoTeams") => void
+    setState: (state: "signin" | "signup" | "playerList" | "twoTeams") => void,
+    players: string[]
 }
 
 interface signInFormDataType {
@@ -12,7 +14,14 @@ interface signInFormDataType {
     password: string
 }
 
-const RegistrationForms = ({state, setState} : RegistrationFormsProps) => {
+interface signinResponseType {
+    success: boolean,
+    authData? : string[],
+    error: string
+}
+
+const RegistrationForms = ({state, setState, players} : RegistrationFormsProps) => {
+
 
     const signinFormHandler = (e: FormEvent<HTMLFormElement>) => { 
         e.preventDefault()
@@ -23,23 +32,27 @@ const RegistrationForms = ({state, setState} : RegistrationFormsProps) => {
             password: signInFormData.get('password') as string,
         }
 
-        console.log(signInFormData)
-        console.log({ username: signInDataObject.username, password: signInDataObject.password})
-
         socket.emit('signin-request', { username: signInDataObject.username, password: signInDataObject.password})
-
-        // setState("playerList")
     }
 
-    useEffect(() => { 
-        socket.on('signin-response', (data) => {
-            if(data.success) { 
-                setState("playerList")
+    useEffect(() => {
+        const handleSigninResponse = (data: signinResponseType) => {
+            if (data.success) {
+                console.log(data.authData);
+                if (players.length === 0) {
+                    setState("playerList");
+                }
             } else {
-                console.log('something wrong is going on here ...')
+                console.log('something wrong is going on here ...');
             }
-        })
-    })
+        };
+
+        socket.on('signin-response', handleSigninResponse);
+
+        return () => {
+            socket.off('signin-response', handleSigninResponse);
+        };
+    }, [players.length, setState]);
 
 
     return ( 
@@ -56,13 +69,13 @@ const RegistrationForms = ({state, setState} : RegistrationFormsProps) => {
 
             {state === 'signup' && <div className="mainPage_signinForm-modal">
                 <div className="backdrop" />
-                <form className="mainPage--signinForm" onSubmit={signinFormHandler}>
+                {/* <form className="mainPage--signinForm">
                     <label>Username</label><input type="text" />
                     <label>Password</label><input type="password" />
                     <label>Confirm Password</label><input type="password" />
                     <button type="submit" className="original-button">SIGN IN</button>
                     <button type="button" className="link-button" onClick={() => setState("signin")}>Already a member? Sign In!</button>
-                </form>
+                </form> */}
             </div>}
         </>
      );

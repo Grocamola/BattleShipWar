@@ -16,18 +16,20 @@ const io = new Server(server, {
 
 app.use(express.json());
 
+const activeUsers = {};
+
 
 io.on('connection', (socket) => {
   console.log('a user connected');
+  activeUsers[socket.id] = true;
   
   socket.on('disconnect', () => {
+    delete activeUsers[socket.id];
     console.log('user disconnected');
   });
 
 
-  socket.on('signin-request', async ({username, password}) => {
-    // console.log('signin-request received:', { username, password });
-
+  socket.on('signin-request', async ({ username, password }) => {
     if (!username || !password) {
       console.error('Username or password missing');
       socket.emit('signin-response', { success: false, error: 'Username or password missing' });
@@ -38,6 +40,8 @@ io.on('connection', (socket) => {
       const authData = await pb.collection('Players').authWithPassword(username, password);
       console.log('Authentication successful:', authData);
       socket.emit('signin-response', { success: true, authData });
+      console.log(activeUsers);
+      io.emit('activeUsers', Object.keys(activeUsers));
     } catch (error) {
       console.error('Authentication error:', error);
       socket.emit('signin-response', { success: false, error: error.message });
