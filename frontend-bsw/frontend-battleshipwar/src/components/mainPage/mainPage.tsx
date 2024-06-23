@@ -1,19 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
-
+import socket from '../__utils/requests/socket'
+import { useUserContext } from "../__utils/hooks/username-context";
+import RegistrationForms from "../__utils/forms/registrationForms";
 
 import './mainPage.css'
-import RegistrationForms from "../__utils/forms/registrationForms";
+
+
 
 
 const MainPage = () => {
 
     const navigate = useNavigate();
 
-    const [players, setPlayers] = useState<string[]>(["Tony", "Mike", "Sophie", "Jordan", "Sepp", "Nadia", "Anatolie"])
-    const [state, setState] = useState<"signin" | "signup" | "playerList" | "twoTeams">("signin")
+    const {state, setState} = useUserContext()
 
-
+    const [players, setPlayers] = useState<string[]>([])
+    
     const teamUpBtnHandler = () => { 
         setState("twoTeams")
         setPlayers(prev => shuffle(prev))
@@ -27,6 +30,20 @@ const MainPage = () => {
         return array; 
     }; 
 
+    useEffect(() => {
+        const handleActiveUsers = (users: string[]) => {
+            setPlayers([...users]);
+            console.log("here: ", users);
+        };
+
+        socket.on("activeUsers", handleActiveUsers);
+        
+        return () => {
+            socket.off("activeUsers", handleActiveUsers);
+        };
+    }, []);
+
+
     const startTheGameBtnHandler = () => { 
         // navigate to boards - TBD
         navigate('/boards');
@@ -36,13 +53,13 @@ const MainPage = () => {
         <>
             <div className="mainPage--container">
                 
-                <RegistrationForms state={state} setState={setState} />
+                <RegistrationForms state={state} setState={setState} players={players} />
 
                 {state === "playerList" && <div>
                     <div className="mainPage--playerList">
                         <h1>Players</h1>
                         <hr />
-                        <ul>{players.map(player => <li>{player}</li>)}</ul>
+                        <ul>{players.map((player, index) => <li key={index}>{player}</li>)}</ul>
                     </div>
                 </div>}
                 {state === "playerList" && players.length > 6 && <button className="original-button" onClick={teamUpBtnHandler}>Team up</button>}
