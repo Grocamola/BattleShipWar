@@ -21,12 +21,19 @@ const activeUsers = {};
 
 io.on('connection', (socket) => {
   console.log('a user connected');
-  activeUsers[socket.id] = true;
+  // activeUsers[socket.id] = true;
   
   socket.on('disconnect', () => {
     delete activeUsers[socket.id];
+    io.emit('activeUsers', Object.values(activeUsers));
     console.log('user disconnected');
   });
+
+  socket.on('logout', (user) => { 
+    delete activeUsers[socket.id];
+    io.emit('activeUsers', Object.values(activeUsers));
+    console.log('user logged out');
+  })
 
 
   socket.on('signin-request', async ({ username, password }) => {
@@ -39,9 +46,13 @@ io.on('connection', (socket) => {
     try {
       const authData = await pb.collection('Players').authWithPassword(username, password);
       console.log('Authentication successful:', authData);
+
+      activeUsers[socket.id] = username;
       socket.emit('signin-response', { success: true, authData });
       console.log(activeUsers);
-      io.emit('activeUsers', Object.keys(activeUsers));
+
+      io.emit('activeUsers', Object.values(activeUsers));
+      
     } catch (error) {
       console.error('Authentication error:', error);
       socket.emit('signin-response', { success: false, error: error.message });

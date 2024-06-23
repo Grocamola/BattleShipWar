@@ -1,8 +1,9 @@
 import { Route, Routes } from 'react-router-dom'
 import MainPage from './components/mainPage/mainPage'
-
-import './App.css'
 import Navbar from './components/__utils/UI-Elements/navbar/navbar'
+import { UserProvider } from './components/__utils/hooks/username-context'
+import './App.css'
+
 
 
 
@@ -12,11 +13,13 @@ function App() {
 
   return (
     <>
-      <Navbar />
-      <Routes>
-        <Route path="*" element={<MainPage />} />
-        <Route path="/boards" element={<MainPage />} />
-      </Routes>
+      <UserProvider>
+        <Navbar />
+        <Routes>
+          <Route path="*" element={<MainPage />} />
+          <Route path="/boards" element={<MainPage />} />
+        </Routes>
+      </UserProvider>
     </>
   )
 }

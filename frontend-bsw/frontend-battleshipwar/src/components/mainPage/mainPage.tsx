@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import socket from '../__utils/requests/socket'
-
+import { useUserContext } from "../__utils/hooks/username-context";
 import RegistrationForms from "../__utils/forms/registrationForms";
 
 import './mainPage.css'
+
 
 
 
@@ -12,10 +13,10 @@ const MainPage = () => {
 
     const navigate = useNavigate();
 
+    const {state, setState} = useUserContext()
+
     const [players, setPlayers] = useState<string[]>([])
-    const [state, setState] = useState<"signin" | "signup" | "playerList" | "twoTeams">("signin")
-
-
+    
     const teamUpBtnHandler = () => { 
         setState("twoTeams")
         setPlayers(prev => shuffle(prev))

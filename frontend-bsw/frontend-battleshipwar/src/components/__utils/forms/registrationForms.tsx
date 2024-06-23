@@ -1,6 +1,7 @@
 import { FormEvent } from 'react'
 import socket from '../requests/socket'
 import { useEffect } from 'react'
+import { useUserContext } from '../hooks/username-context'
 
 
 interface RegistrationFormsProps { 
@@ -16,11 +17,29 @@ interface signInFormDataType {
 
 interface signinResponseType {
     success: boolean,
-    authData? : string[],
+    authData? : AuthData,
     error: string
+}
+interface AuthData {
+    record: RecordData;
+    token: string;
+}
+
+interface RecordData {
+collectionId: string;
+collectionName: string;
+created: string;
+email: string;
+emailVisibility: boolean;
+id: string;
+updated: string;
+username: string;
+verified: boolean;
 }
 
 const RegistrationForms = ({state, setState, players} : RegistrationFormsProps) => {
+
+    const {setUser} = useUserContext()
 
 
     const signinFormHandler = (e: FormEvent<HTMLFormElement>) => { 
@@ -39,6 +58,7 @@ const RegistrationForms = ({state, setState, players} : RegistrationFormsProps) 
         const handleSigninResponse = (data: signinResponseType) => {
             if (data.success) {
                 console.log(data.authData);
+                setUser(data.authData!.record.username)
                 if (players.length === 0) {
                     setState("playerList");
                 }
