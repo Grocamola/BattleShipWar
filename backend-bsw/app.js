@@ -17,22 +17,32 @@ const io = new Server(server, {
 app.use(express.json());
 
 const activeUsers = {};
+let teamAttackers = [];
+let teamDefenders = [];
+
+const shuffle = (array) => { 
+  for (let i = array.length - 1; i > 0; i--) { 
+    const j = Math.floor(Math.random() * (i + 1)); 
+    [array[i], array[j]] = [array[j], array[i]]; 
+  } 
+  return array; 
+}; 
 
 
 io.on('connection', (socket) => {
-  console.log('a user connected');
+  // console.log('a user connected');
   // activeUsers[socket.id] = true;
   
   socket.on('disconnect', () => {
     delete activeUsers[socket.id];
     io.emit('activeUsers', Object.values(activeUsers));
-    console.log('user disconnected');
+    // console.log('user disconnected');
   });
 
   socket.on('logout', (user) => { 
     delete activeUsers[socket.id];
     io.emit('activeUsers', Object.values(activeUsers));
-    console.log('user logged out');
+    // console.log('user logged out');
   })
 
 
@@ -60,6 +70,17 @@ io.on('connection', (socket) => {
       state = 'signup'
       io.emit('state-change', state)
     }
+  });
+
+  socket.on('shuffledTeam-request', () => {
+    const activeUsernames = Object.values(activeUsers);  // Convert object to array
+    const shuffledArray = shuffle(activeUsernames);  // Shuffle the array
+    const middlePoint = Math.floor(shuffledArray.length / 2);
+    teamAttackers = shuffledArray.slice(0, middlePoint);
+    teamDefenders = shuffledArray.slice(middlePoint);
+    io.emit('shuffled-teams-response', {teamA: teamAttackers, teamD: teamDefenders})
+    state="twoTeams"
+    io.emit('state-change', state)
   });
 
 
