@@ -1,10 +1,14 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 
+export type stateType = {
+    state: "signin" | "signup" | "playerList" | "twoTeams";
+}
+
 type ContextProps = {
     user: string;
     setUser: (user: string) => void;
-    state: "signin" | "signup" | "playerList" | "twoTeams";
-    setState: (value: "signin" | "signup" | "playerList" | "twoTeams") => void
+    state: stateType['state'];
+    setState: (value: stateType['state']) => void
 };
 
 export const UserContext = createContext<ContextProps | undefined>(undefined);

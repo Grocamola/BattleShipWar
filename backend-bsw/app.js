@@ -56,8 +56,13 @@ io.on('connection', (socket) => {
     } catch (error) {
       console.error('Authentication error:', error);
       socket.emit('signin-response', { success: false, error: error.message });
+
+      state = 'signup'
+      io.emit('state-change', state)
     }
   });
+
+
 });
 
 

@@ -1,12 +1,12 @@
 import { FormEvent } from 'react'
 import socket from '../requests/socket'
 import { useEffect } from 'react'
-import { useUserContext } from '../hooks/username-context'
+import { stateType, useUserContext } from '../hooks/username-context'
 
 
 interface RegistrationFormsProps { 
-    state: "signin" | "signup" | "playerList" | "twoTeams",
-    setState: (state: "signin" | "signup" | "playerList" | "twoTeams") => void,
+    state: stateType['state'],
+    setState: (state: stateType['state']) => void,
     players: string[]
 }
 
@@ -26,15 +26,15 @@ interface AuthData {
 }
 
 interface RecordData {
-collectionId: string;
-collectionName: string;
-created: string;
-email: string;
-emailVisibility: boolean;
-id: string;
-updated: string;
-username: string;
-verified: boolean;
+    collectionId: string;
+    collectionName: string;
+    created: string;
+    email: string;
+    emailVisibility: boolean;
+    id: string;
+    updated: string;
+    username: string;
+    verified: boolean;
 }
 
 const RegistrationForms = ({state, setState, players} : RegistrationFormsProps) => {
@@ -72,7 +72,9 @@ const RegistrationForms = ({state, setState, players} : RegistrationFormsProps) 
         return () => {
             socket.off('signin-response', handleSigninResponse);
         };
-    }, [players.length, setState]);
+    }, [players.length, setState, setUser]);
+
+
 
 
     return ( 
@@ -89,13 +91,13 @@ const RegistrationForms = ({state, setState, players} : RegistrationFormsProps) 
 
             {state === 'signup' && <div className="mainPage_signinForm-modal">
                 <div className="backdrop" />
-                {/* <form className="mainPage--signinForm">
+                <form className="mainPage--signinForm">
                     <label>Username</label><input type="text" />
                     <label>Password</label><input type="password" />
                     <label>Confirm Password</label><input type="password" />
                     <button type="submit" className="original-button">SIGN IN</button>
                     <button type="button" className="link-button" onClick={() => setState("signin")}>Already a member? Sign In!</button>
-                </form> */}
+                </form>
             </div>}
         </>
      );
