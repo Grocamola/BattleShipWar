@@ -16,6 +16,10 @@ const io = new Server(server, {
 
 app.use(express.json());
 
+const generateRoomId = () => {
+  return Math.random().toString(36).substring(7);
+}
+
 const activeUsers = {};
 let teamAttackers = [];
 let teamDefenders = [];
@@ -82,6 +86,19 @@ io.on('connection', (socket) => {
     state="twoTeams"
     io.emit('state-change', state)
   });
+
+  socket.on('startTheGame-request', () => {
+    const attackersRoomId = generateRoomId()
+    const defendersRoomId = generateRoomId()
+
+    if(teamAttackers.indexOf(socket.id) > -1) { 
+      socket.join(attackersRoomId)
+    } else if(teamDefenders.indexOf(socket.id) > -1) { 
+      socket.join(defendersRoomId)
+    }
+
+    socket.emit('startTheGame-response',{attackersRoomId: attackersRoomId, defendersRoomId: defendersRoomId})
+  })
 
 
 });

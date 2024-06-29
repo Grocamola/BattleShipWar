@@ -11,12 +11,17 @@ interface shuffledTeamData {
     teamD: string[]
 }
 
+interface startTheGameResponseType { 
+    attackersRoomId: string,
+    defendersRoomId: string
+}
+
 
 const MainPage = () => {
 
     const navigate = useNavigate();
 
-    const {state, setState} = useUserContext()
+    const {user, state, setState} = useUserContext()
 
     const [players, setPlayers] = useState<string[]>([])
     const [attackers, setAttackers] = useState<string[]>([])
@@ -25,14 +30,13 @@ const MainPage = () => {
     const teamUpBtnHandler = () => { 
         socket.emit('shuffledTeam-request')
     }
-
-    
+    const startTheGameBtnHandler = () => { 
+        socket.emit('startTheGame-request')
+        // navigate('/boards');
+    }
 
     useEffect(() => {
-        const handleActiveUsers = (users: string[]) => {
-            setPlayers([...users]);
-            // console.log("here: ", users);
-        };
+        const handleActiveUsers = (users: string[]) => setPlayers([...users]);
 
         const setPlayersToTeamHander = (data: shuffledTeamData) => { 
             console.log(data)
@@ -40,22 +44,29 @@ const MainPage = () => {
             setDefenders(data.teamD)
         }
 
+        const startTheGameNavigationHandler = (data: startTheGameResponseType) => {
+            console.log(data)
+            console.log(`id: ${user}, attackers are: ${attackers}, defenders are: ${defenders}`)
+            if(attackers.indexOf(user) > -1) { 
+                navigate(`/boards-attackers/${data.attackersRoomId}`, {replace: true})
+            } else if(defenders.indexOf(user) > -1) { 
+                navigate(`/boards-defenders/${data.attackersRoomId}`, {replace: true})
+            }
+        }
+
         socket.on("activeUsers", handleActiveUsers);
         socket.on('shuffled-teams-response', setPlayersToTeamHander)
         socket.on('state-change', (data:"signin" | "twoTeams") => setState(data))
+        socket.on('startTheGame-response', (data: startTheGameResponseType) => startTheGameNavigationHandler(data))
         
         return () => {
             socket.off("activeUsers", handleActiveUsers);
             socket.off('shuffled-teams-response', setPlayersToTeamHander);
             socket.off('state-change', (data:"signin" | "twoTeams") => setState(data))
+            socket.off('startTheGame-response', (data: startTheGameResponseType) => startTheGameNavigationHandler(data))
         };
     }, []);
 
-
-    const startTheGameBtnHandler = () => { 
-        // navigate to boards - TBD
-        navigate('/boards');
-    }
 
     return ( 
         <>
