@@ -17,12 +17,12 @@ const MainBoard = () => {
     const [attackersLocations, setAttackersLocations] = useState([[1,4], [3,5]])
 
     const defendHandler = (location: number[]) => {
-        let tempBoardDefenders = [...boardStructure];
+        const tempBoardDefenders = [...boardStructure];
         console.log(tempBoardDefenders[location[0], location[1]])
     }
 
     useMemo(() => {
-        let tempBoard = boardStructure;
+        const tempBoard = boardStructure;
         attackersLocations.map(location => tempBoard[location[0]][location[1]] = 'ship')
         setBoardStructure(tempBoard)
     },[attackersLocations])

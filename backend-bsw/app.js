@@ -23,6 +23,15 @@ const generateRoomId = () => {
 const activeUsers = {};
 let teamAttackers = [];
 let teamDefenders = [];
+var board = [
+  [0,'ship',0,'Rock',0,0,0],
+  [0,0,0,0,0,0,0],
+  [0,'Rock',0,0,0,0,0],
+  [0,0,0,0,0,'ship',0],
+  [0,0,0,'ship','Rock',0,0],
+  [0,0,0,0,0,0,0],
+  [0,0,'Rock',0,0,0,0]
+]
 
 const shuffle = (array) => { 
   for (let i = array.length - 1; i > 0; i--) { 
@@ -34,21 +43,19 @@ const shuffle = (array) => {
 
 
 io.on('connection', (socket) => {
-  // console.log('a user connected');
-  // activeUsers[socket.id] = true;
-  
+  console.log('a user connected');
+
   socket.on('disconnect', () => {
     delete activeUsers[socket.id];
     io.emit('activeUsers', Object.values(activeUsers));
-    // console.log('user disconnected');
+    console.log('user disconnected');
   });
 
-  socket.on('logout', (user) => { 
+  socket.on('logout', (user) => {
     delete activeUsers[socket.id];
     io.emit('activeUsers', Object.values(activeUsers));
-    // console.log('user logged out');
-  })
-
+    console.log('user logged out');
+  });
 
   socket.on('signin-request', async ({ username, password }) => {
     if (!username || !password) {
@@ -70,42 +77,50 @@ io.on('connection', (socket) => {
     } catch (error) {
       console.error('Authentication error:', error);
       socket.emit('signin-response', { success: false, error: error.message });
-
-      state = 'signup'
-      io.emit('state-change', state)
+      state = 'signup';
+      io.emit('state-change', state);
     }
   });
 
   socket.on('shuffledTeam-request', () => {
-    const activeUsernames = Object.values(activeUsers);  // Convert object to array
-    const shuffledArray = shuffle(activeUsernames);  // Shuffle the array
+    const activeUsernames = Object.values(activeUsers);
+    const shuffledArray = shuffle(activeUsernames);
     const middlePoint = Math.floor(shuffledArray.length / 2);
     teamAttackers = shuffledArray.slice(0, middlePoint);
     teamDefenders = shuffledArray.slice(middlePoint);
-    io.emit('shuffled-teams-response', {teamA: teamAttackers, teamD: teamDefenders})
-    state="twoTeams"
-    io.emit('state-change', state)
+    io.emit('shuffled-teams-response', { teamA: teamAttackers, teamD: teamDefenders });
+    state = "twoTeams";
+    io.emit('state-change', state);
   });
 
+  var attackersRoomId = generateRoomId();
+  var defendersRoomId = generateRoomId();
+
   socket.on('startTheGame-request', () => {
-    const attackersRoomId = generateRoomId()
-    const defendersRoomId = generateRoomId()
+    teamAttackers.forEach((username) => {
+      const socketId = Object.keys(activeUsers).find(id => activeUsers[id] === username);
+      if (socketId) {
+        io.sockets.sockets.get(socketId).join(attackersRoomId);
+        console.log(`User ${username} joined attackers room`);
+      }
+    });
 
-    if(teamAttackers.indexOf(socket.id) > -1) { 
-      socket.join(attackersRoomId)
-    } else if(teamDefenders.indexOf(socket.id) > -1) { 
-      socket.join(defendersRoomId)
-    }
+    teamDefenders.forEach((username) => {
+      const socketId = Object.keys(activeUsers).find(id => activeUsers[id] === username);
+      if (socketId) {
+        io.sockets.sockets.get(socketId).join(defendersRoomId);
+        console.log(`User ${username} joined defenders room`);
+      }
+    });
 
-    socket.emit('startTheGame-response',{attackersRoomId: attackersRoomId, defendersRoomId: defendersRoomId})
-  })
+    io.emit('startTheGame-response', { attackersRoomId: attackersRoomId, defendersRoomId: defendersRoomId });
+  });
 
-
+  socket.on('get-attackers-board', () => {
+    console.log('Emitting board data to attackers');
+    io.to(attackersRoomId).emit('attackers-board-response', { board: board });
+  });
 });
-
-
-
-
 
 const PORT = process.env.PORT || 4000;
 

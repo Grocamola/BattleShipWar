@@ -11,10 +11,10 @@ interface shuffledTeamData {
     teamD: string[]
 }
 
-interface startTheGameResponseType { 
-    attackersRoomId: string,
-    defendersRoomId: string
-}
+// interface startTheGameResponseType { 
+//     attackersRoomId: string,
+//     defendersRoomId: string
+// }
 
 
 const MainPage = () => {
@@ -32,40 +32,46 @@ const MainPage = () => {
     }
     const startTheGameBtnHandler = () => { 
         socket.emit('startTheGame-request')
+        console.log("isAttacker:",attackers.indexOf(user))
+        console.log("isDefender:",defenders.indexOf(user))
         // navigate('/boards');
     }
 
+    const handleActiveUsers = (users: string[]) => setPlayers([...users]);
+
+    const setPlayersToTeamHander = (data: shuffledTeamData) => { 
+        setAttackers(data.teamA)
+        setDefenders(data.teamD)
+    }
+
+    // const startTheGameNavigationHandler = (data: startTheGameResponseType) => {
+    //     console.log(data)
+    //     if(attackers.indexOf(user) > -1) { 
+    //         navigate(`/boards-attackers/${data.attackersRoomId}`, {replace: true})
+    //     } else if(defenders.indexOf(user) > -1) { 
+    //         navigate(`/boards-defenders/${data.attackersRoomId}`, {replace: true})
+    //     }
+    // }
+
     useEffect(() => {
-        const handleActiveUsers = (users: string[]) => setPlayers([...users]);
-
-        const setPlayersToTeamHander = (data: shuffledTeamData) => { 
-            console.log(data)
-            setAttackers(data.teamA)
-            setDefenders(data.teamD)
-        }
-
-        const startTheGameNavigationHandler = (data: startTheGameResponseType) => {
-            console.log(data)
-            console.log(`id: ${user}, attackers are: ${attackers}, defenders are: ${defenders}`)
-            if(attackers.indexOf(user) > -1) { 
-                navigate(`/boards-attackers/${data.attackersRoomId}`, {replace: true})
-            } else if(defenders.indexOf(user) > -1) { 
-                navigate(`/boards-defenders/${data.attackersRoomId}`, {replace: true})
-            }
-        }
-
         socket.on("activeUsers", handleActiveUsers);
         socket.on('shuffled-teams-response', setPlayersToTeamHander)
         socket.on('state-change', (data:"signin" | "twoTeams") => setState(data))
-        socket.on('startTheGame-response', (data: startTheGameResponseType) => startTheGameNavigationHandler(data))
+        socket.on('startTheGame-response', (data) => {
+            if (attackers.includes(user)) {
+                navigate(`/boards-attackers/${data.attackersRoomId}`, { replace: true });
+            } else if (defenders.includes(user)) {
+                navigate(`/boards-defenders/${data.defendersRoomId}`, { replace: true });
+            }
+        });
         
         return () => {
             socket.off("activeUsers", handleActiveUsers);
             socket.off('shuffled-teams-response', setPlayersToTeamHander);
             socket.off('state-change', (data:"signin" | "twoTeams") => setState(data))
-            socket.off('startTheGame-response', (data: startTheGameResponseType) => startTheGameNavigationHandler(data))
+            socket.off('startTheGame-response');
         };
-    }, []);
+    }, [attackers, defenders, navigate, setState, user]);
 
 
     return ( 
@@ -87,13 +93,13 @@ const MainPage = () => {
                     <div className="team--attackers">
                         <h3>Team Attackers</h3><hr />
                         <ul>
-                            {attackers.map(attacker => <p>{attacker}</p>)}
+                            {attackers.map((attacker, index) => <p key={index}>{attacker}</p>)}
                         </ul>
                     </div>
                     <div className="team--defenders">
                         <h3>Team Defenders</h3><hr />
                         <ul>
-                           {defenders.map(defender => <p>{defender}</p>)}
+                           {defenders.map((defender, index) => <p key={index}>{defender}</p>)}
                         </ul>
                     </div>
                 </div>}
